@@ -1,0 +1,205 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+    /* Casino dark theme */
+    --background: 0.06 0.02 295;
+    --foreground: 0.95 0.01 300;
+    --card: 0.1 0.04 295;
+    --card-foreground: 0.95 0.01 300;
+    --popover: 0.1 0.04 295;
+    --popover-foreground: 0.95 0.01 300;
+    /* Gold primary */
+    --primary: 0.72 0.13 78;
+    --primary-foreground: 0.06 0.02 295;
+    --secondary: 0.14 0.05 295;
+    --secondary-foreground: 0.84 0.02 300;
+    --muted: 0.12 0.03 295;
+    --muted-foreground: 0.6 0.02 300;
+    --accent: 0.6 0.12 78;
+    --accent-foreground: 0.06 0.02 295;
+    --destructive: 0.48 0.22 25;
+    --destructive-foreground: 0.95 0.01 300;
+    --border: 0.3 0.06 78;
+    --input: 0.14 0.04 295;
+    --ring: 0.72 0.13 78;
+    --chart-1: 0.72 0.13 78;
+    --chart-2: 0.73 0.15 230;
+    --chart-3: 0.48 0.22 25;
+    --chart-4: 0.6 0.12 78;
+    --chart-5: 0.84 0.16 78;
+    --sidebar: 0.08 0.03 295;
+    --sidebar-foreground: 0.95 0.01 300;
+    --sidebar-primary: 0.72 0.13 78;
+    --sidebar-primary-foreground: 0.06 0.02 295;
+    --sidebar-accent: 0.14 0.05 295;
+    --sidebar-accent-foreground: 0.84 0.02 300;
+    --sidebar-border: 0.3 0.06 78;
+    --sidebar-ring: 0.72 0.13 78;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background: radial-gradient(
+      ellipse at top,
+      oklch(0.09 0.04 295) 0%,
+      oklch(0.05 0.02 295) 60%,
+      oklch(0.04 0.01 295) 100%
+    );
+    min-height: 100vh;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .font-cinzel {
+    font-family: "Cinzel", serif;
+  }
+  .font-cinzel-deco {
+    font-family: "Cinzel Decorative", serif;
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, #f6d27a 0%, #c7902b 50%, #7a4f12 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gold-gradient-bg {
+    background: linear-gradient(135deg, #f6d27a 0%, #c7902b 60%, #7a4f12 100%);
+  }
+
+  .gold-border {
+    border: 1px solid #b88a2a;
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 20px rgba(199, 144, 43, 0.4), 0 0 40px
+      rgba(199, 144, 43, 0.15), inset 0 0 20px rgba(199, 144, 43, 0.05);
+  }
+
+  .gold-text-glow {
+    text-shadow: 0 0 20px rgba(255, 211, 106, 0.8), 0 0 40px
+      rgba(199, 144, 43, 0.5);
+  }
+
+  .jackpot-glow {
+    text-shadow: 0 0 30px rgba(255, 211, 106, 0.9), 0 0 60px
+      rgba(199, 144, 43, 0.6), 0 0 90px rgba(122, 79, 18, 0.4);
+  }
+
+  .card-casino {
+    background: oklch(0.1 0.04 295);
+    border: 1px solid oklch(0.35 0.08 78);
+    box-shadow: 0 0 30px rgba(199, 144, 43, 0.1), inset 0 1px 0
+      rgba(246, 210, 122, 0.1);
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, #f6d27a 0%, #c7902b 50%, #7a4f12 100%);
+    border: 1px solid #f6d27a;
+    color: #0b0710;
+    font-family: "Cinzel", serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 0 20px rgba(246, 210, 122, 0.4), 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .btn-gold:hover:not(:disabled) {
+    box-shadow: 0 0 30px rgba(246, 210, 122, 0.7), 0 4px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-gold:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .number-ball {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e84040, #c61e1e, #7a0000);
+    border: 1px solid #e84040;
+    box-shadow: 0 0 8px rgba(198, 30, 30, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    animation: sparkle-float 6s ease-in-out infinite;
+  }
+
+  @keyframes sparkle-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+      opacity: 1;
+    }
+  }
+
+  @keyframes pulse-gold {
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(199, 144, 43, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(199, 144, 43, 0.8), 0 0 60px
+        rgba(246, 210, 122, 0.3);
+    }
+  }
+
+  .pulse-gold {
+    animation: pulse-gold 2s ease-in-out infinite;
+  }
+
+  @keyframes count-up {
+    from {
+      transform: scale(0.95);
+      opacity: 0.7;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #b88a2a,
+      #ffd36a,
+      #b88a2a,
+      transparent
+    );
+    margin: 2rem 0;
+  }
+}
