@@ -7,6 +7,7 @@ import { Header } from "./components/Header";
 import { HeroSection } from "./components/HeroSection";
 import { HowItWorks } from "./components/HowItWorks";
 import { PastDraws } from "./components/PastDraws";
+import { useActor } from "./hooks/useActor";
 import { useInternetIdentity } from "./hooks/useInternetIdentity";
 import {
   useAdminSetup,
@@ -17,29 +18,35 @@ import { getCurrentWeekYear } from "./utils/lottery";
 
 export default function App() {
   const { loginStatus, identity } = useInternetIdentity();
+  const { actor, isFetching: actorFetching } = useActor();
   const isConnected = loginStatus === "success" && !!identity;
+  const actorReady = !!actor && !actorFetching && isConnected;
   const { data: isAdmin } = useIsLotteryAdmin();
   const adminSetup = useAdminSetup();
   const setupLotteryAdmin = useSetupLotteryAdmin();
   const setupCalled = useRef(false);
 
-  const runSetup = useCallback(() => {
+  const runSetup = useCallback(async () => {
     const { week, year } = getCurrentWeekYear();
-    // Try to register as lottery admin (only first caller succeeds)
-    setupLotteryAdmin.mutateAsync().catch(() => {});
-    // Initialize round year/week (only updates if not already set)
-    adminSetup
-      .mutateAsync({ year: BigInt(year), week: BigInt(week) })
-      .catch(() => {});
+    try {
+      await setupLotteryAdmin.mutateAsync();
+    } catch (_) {
+      // ignore – non-first callers will get false, which is fine
+    }
+    try {
+      await adminSetup.mutateAsync({ year: BigInt(year), week: BigInt(week) });
+    } catch (_) {
+      // ignore
+    }
   }, [setupLotteryAdmin, adminSetup]);
 
-  // Run setup on every new wallet connection
+  // Run setup once per session when actor is ready and user is connected
   useEffect(() => {
-    if (isConnected && !setupCalled.current) {
+    if (actorReady && !setupCalled.current) {
       setupCalled.current = true;
-      runSetup();
+      void runSetup();
     }
-  }, [isConnected, runSetup]);
+  }, [actorReady, runSetup]);
 
   // Reset flag when disconnected
   useEffect(() => {
@@ -85,7 +92,9 @@ export default function App() {
         {isAdmin && (
           <>
             <div className="gold-divider mx-8" />
-            <AdminPanel />
+            <div id="admin">
+              <AdminPanel />
+            </div>
           </>
         )}
       </main>

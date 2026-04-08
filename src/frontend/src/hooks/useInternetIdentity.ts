@@ -247,16 +247,19 @@ export function InternetIdentityProvider({
         if (isAuthenticated) {
           const loadedIdentity = existingClient.getIdentity();
           setIdentity(loadedIdentity);
+          if (!cancelled) setStatus("success");
+        } else {
+          if (!cancelled) setStatus("idle");
         }
       } catch (unknownError) {
-        setStatus("loginError");
-        setError(
-          unknownError instanceof Error
-            ? unknownError
-            : new Error("Initialization failed"),
-        );
-      } finally {
-        if (!cancelled) setStatus("idle");
+        if (!cancelled) {
+          setStatus("loginError");
+          setError(
+            unknownError instanceof Error
+              ? unknownError
+              : new Error("Initialization failed"),
+          );
+        }
       }
     })();
     return () => {

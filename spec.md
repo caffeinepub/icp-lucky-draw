@@ -1,37 +1,25 @@
 # ICP Lucky Draw
 
 ## Current State
-A lottery app where users buy tickets and an admin manages draws. Backend has `buyTicket()` with no actual ICP transfer. Admin panel is hidden because of a chicken-and-egg bug (only shows after isAdmin=true, but admin is only set by calling adminSetup which only runs when isAdmin=true). No ICP balance is shown after connecting.
+The app is a casino-style ICP lottery. Key components:
+- `useInternetIdentity.ts` - Auth hook managing Internet Identity login state
+- `useQueries.ts` - React Query hooks for backend and ICP ledger interactions
+- `Header.tsx` - Responsive nav with wallet dropdown and mobile drawer
+- `HeroSection.tsx` - Jackpot display and buy ticket CTA
+- `backend/main.mo` - Motoko lottery backend
 
 ## Requested Changes (Diff)
 
 ### Add
-- Real ICP transfer via ICRC-2 in `buyTicket()`: frontend approves spend on ICP ledger, backend calls `icrc2_transfer_from`
-- `setupLotteryAdmin()` backend function: first caller becomes lottery admin (stable, persists upgrades)
-- `isLotteryAdmin()` query: returns if caller is lottery admin  
-- `getTicketPrice()` query: returns ticket price in e8s
-- `setAdminWallet(principal)` admin function: stores admin 5% wallet address
-- `getAdminWallet()` query: returns admin wallet principal
-- `icpLedger.ts` utility: wraps ICRC-1 balance query and ICRC-2 approve calls to ICP mainnet ledger
-- ICP balance display in Header after wallet connect
-- `useIcpBalance` hook, `useSetupLotteryAdmin` hook, `useIsLotteryAdmin` hook, `useSetAdminWallet` hook, `useTicketPrice` hook
+- Nothing new
 
 ### Modify
-- `adminSetup()`: no longer traps for non-admin callers; if no admin exists sets first caller; if admin already set and caller IS admin updates year/week; else does nothing
-- `buyTicket()`: calls ICP ledger `icrc2_transfer_from` before recording ticket
-- `App.tsx`: remove `isAdmin &&` condition on adminSetup, call `setupLotteryAdmin` on every connect
-- Admin panel gated by `isLotteryAdmin` (not `isCallerAdmin`)
-- `useBuyTicket`: approve ICP spend before calling buyTicket
-- AdminPanel wallet save wired to `setAdminWallet`
+- **`useInternetIdentity.ts`** (critical bug fix): The `useEffect` that restores saved sessions has a `finally` block that unconditionally sets `loginStatus` to `"idle"` even after successfully finding and restoring an authenticated identity. This causes login state to be lost on every page refresh. Fix: remove the `finally` block's status setter and instead set `"success"` inside the `if (isAuthenticated)` branch and `"idle"` in the `else` branch.
+- **`useInternetIdentity.ts`** (secondary bug): The `useEffect` depends on `authClient` state, which causes re-runs when `setAuthClient` is called inside the effect. Guard with a ref or use a separate initialization flag to prevent double-runs.
 
 ### Remove
-- Nothing removed
+- Nothing
 
 ## Implementation Plan
-1. Rewrite `main.mo` with ICRC-2 ledger integration, stable admin vars, new query/update functions
-2. Update `backend.did.js`, `backend.did.d.ts`, `backend.d.ts`, `backend.ts` with new methods
-3. Create `icpLedger.ts` with balance and approve utilities
-4. Update `useQueries.ts` with new hooks and updated `useBuyTicket`
-5. Fix `App.tsx` admin setup flow
-6. Add ICP balance to `Header.tsx`
-7. Wire wallet save in `AdminPanel.tsx`
+1. Fix `useInternetIdentity.ts`: In the `useEffect` async body, after `await existingClient.isAuthenticated()`, set `setStatus("success")` when `isAuthenticated` is true, and `setStatus("idle")` when false. Remove the `finally` block's `setStatus("idle")` call entirely (keep `finally` for cleanup only if needed, or remove it).
+2. Validate and build frontend.
